@@ -18,7 +18,12 @@
                             if (data.error) {
                                 document.getElementById("weather").innerText = `Error: ${data.error}`;
                             } else {
-                                document.getElementById("weather").innerText = `Temperature: ${data.temperature}°C, Humidity: ${data.humidity}%`;
+                                document.getElementById("weather").innerHTML = `
+                                    <p>Temperature: ${data.temperature}°C</p>
+                                    <p>Humidity: ${data.humidity}%</p>
+                                    <p>Rainfall: ${data.rainfall} mm</p>
+                                    <p>Wind Speed: ${data.wind_speed} km/h</p>
+                                `;
                             }
                         })
                         .catch(error => {
@@ -35,7 +40,7 @@
 </head>
 <body>
     <button onclick="getLocationAndFetchWeather()">Get Weather</button>
-    <p id="weather"></p>
-    <a href="{% url 'logout'%}">logout</a>
+    <div id="weather"></div>
+    <a href="{% url 'logout' %}">Logout</a>
 </body>
 </html>

@@ -57,23 +57,32 @@ import requests
 from django.http import JsonResponse
 
 def get_weather(request):
-    api_key = 'be3b88f1ba1a1a5af46b6dd38ea6b1e2'  # ใส่ API Key จากผู้ให้บริการ เช่น OpenWeatherMap
+    api_key = 'be3b88f1ba1a1a5af46b6dd38ea6b1e2'  # ใส่ API Key จาก OpenWeatherMap
     latitude = request.GET.get('lat')
     longitude = request.GET.get('lon')
 
     if not latitude or not longitude:
         return JsonResponse({'error': 'Latitude and longitude are required.'}, status=400)
 
-    # เรียก API ของ OpenWeatherMap (หรือผู้ให้บริการอื่น)
+    # เรียก API ของ OpenWeatherMap
     url = f'https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&units=metric&appid={api_key}'
     response = requests.get(url)
 
     if response.status_code == 200:
         weather_data = response.json()
+
+        # ตรวจสอบและดึงข้อมูล
+        temperature = weather_data['main']['temp']
+        humidity = weather_data['main']['humidity']
+        wind_speed = weather_data['wind']['speed']
+        rainfall = weather_data.get('rain', {}).get('1h', 0)  # ปริมาณฝนใน 1 ชั่วโมง (ถ้ามี)
+
         return JsonResponse({
-            'temperature': weather_data['main']['temp'],
-            'humidity': weather_data['main']['humidity'],
-            'description': weather_data['weather'][0]['description']
+            'temperature': temperature,
+            'humidity': humidity,
+            'wind_speed': wind_speed,
+            'rainfall': rainfall
         })
     else:
         return JsonResponse({'error': 'Unable to fetch weather data.'}, status=response.status_code)
+
