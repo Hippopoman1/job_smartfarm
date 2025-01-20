@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather by Location</title>
+    <script>
+        function getLocationAndFetchWeather() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    // ส่งตำแหน่งไปที่ Backend
+                    fetch(`/get_weather?lat=${latitude}&lon=${longitude}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.error) {
+                                document.getElementById("weather").innerText = `Error: ${data.error}`;
+                            } else {
+                                document.getElementById("weather").innerText = `Temperature: ${data.temperature}°C, Humidity: ${data.humidity}%`;
+                            }
+                        })
+                        .catch(error => {
+                            document.getElementById("weather").innerText = "Error fetching weather data.";
+                        });
+                }, (error) => {
+                    document.getElementById("weather").innerText = "Unable to get your location.";
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    </script>
+</head>
+<body>
+    <button onclick="getLocationAndFetchWeather()">Get Weather</button>
+    <p id="weather"></p>
+</body>
+</html>
