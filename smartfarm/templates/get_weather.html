@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weather by Location</title>
+    <title>Smart Farm - Weather</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-image: url('https://source.unsplash.com/1920x1080/?farm,weather');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
     <script>
         function getLocationAndFetchWeather() {
             if (navigator.geolocation) {
@@ -19,10 +27,10 @@
                                 document.getElementById("weather").innerText = `Error: ${data.error}`;
                             } else {
                                 document.getElementById("weather").innerHTML = `
-                                    <p>Temperature: ${data.temperature}°C</p>
-                                    <p>Humidity: ${data.humidity}%</p>
-                                    <p>Rainfall: ${data.rainfall} mm</p>
-                                    <p>Wind Speed: ${data.wind_speed} km/h</p>
+                                    <p class="text-lg font-medium">Temperature: ${data.temperature}°C</p>
+                                    <p class="text-lg font-medium">Humidity: ${data.humidity}%</p>
+                                    <p class="text-lg font-medium">Rainfall: ${data.rainfall} mm</p>
+                                    <p class="text-lg font-medium">Wind Speed: ${data.wind_speed} km/h</p>
                                 `;
                             }
                         })
@@ -38,9 +46,14 @@
         }
     </script>
 </head>
-<body>
-    <button onclick="getLocationAndFetchWeather()">Get Weather</button>
-    <div id="weather"></div>
-    <a href="{% url 'logout' %}">Logout</a>
+<body class="bg-green-800 bg-opacity-50 min-h-screen flex items-center justify-center">
+    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-6 max-w-md w-full text-center">
+        <h1 class="text-3xl font-bold text-green-700 mb-6">Smart Farm - Weather</h1>
+        <button onclick="getLocationAndFetchWeather()" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
+            Get Weather
+        </button>
+        <div id="weather" class="mt-4 text-gray-700 text-left"></div>
+        <a href="{% url 'logout' %}" class="block mt-6 text-red-500 hover:underline">Logout</a>
+    </div>
 </body>
 </html>

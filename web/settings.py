@@ -25,8 +25,11 @@ SECRET_KEY = 'django-insecure-pw@%t4h#z*w_kkc0y=3oyue53795es@j()r6+*+=od3ii1_!6h
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# เพิ่ม URL ของ Ngrok ใน ALLOWED_HOSTS
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.0.112', '74b4-223-205-228-208.ngrok-free.app']
 
+# เพิ่ม URL ของ Ngrok ใน CSRF_TRUSTED_ORIGINS
+CSRF_TRUSTED_ORIGINS = ['https://74b4-223-205-228-208.ngrok-free.app']
 
 # Application definition
 

@@ -3,10 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>dashboard</title>
+    <title>Smart Farm - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-image: url('https://source.unsplash.com/1920x1080/?farm,green');
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
 </head>
-<body>
-    <H1>dashboard</H1>
-    <a href="{% url 'logout'%}">logout</a>
+<body class="bg-green-800 bg-opacity-50 min-h-screen flex items-center justify-center">
+    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-8 max-w-lg w-full text-center">
+        <h1 class="text-4xl font-bold text-green-700 mb-6">Smart Farm - Dashboard</h1>
+        <p class="text-lg text-gray-700 mb-6">
+            Welcome to your dashboard. Manage your farm with efficiency and ease.
+        </p>
+        <div class="space-y-4">
+            <a href="{% url 'weather' %}" class="block w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
+                View Weather
+            </a>
+            <a href="{% url 'logout' %}" class="block w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition duration-300">
+                Logout
+            </a>
+        </div>
+    </div>
 </body>
 </html>

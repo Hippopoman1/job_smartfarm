@@ -60,7 +60,8 @@ def get_weather(request):
     api_key = 'be3b88f1ba1a1a5af46b6dd38ea6b1e2'  # ใส่ API Key จาก OpenWeatherMap
     latitude = request.GET.get('lat')
     longitude = request.GET.get('lon')
-
+    print(latitude)
+    print(longitude)
     if not latitude or not longitude:
         return JsonResponse({'error': 'Latitude and longitude are required.'}, status=400)
 
@@ -75,8 +76,7 @@ def get_weather(request):
         temperature = weather_data['main']['temp']
         humidity = weather_data['main']['humidity']
         wind_speed = weather_data['wind']['speed']
-        rainfall = weather_data.get('rain', {}).get('1h', 0)  # ปริมาณฝนใน 1 ชั่วโมง (ถ้ามี)
-
+        rainfall = weather_data.get('rain', {}).get('1h', 0)  
         return JsonResponse({
             'temperature': temperature,
             'humidity': humidity,
