@@ -3,57 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Farm - Weather</title>
+    <title>DEPA IOT APP</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body {
-            background-image: url('https://source.unsplash.com/1920x1080/?farm,weather');
-            background-size: cover;
-            background-position: center;
-        }
-    </style>
+</head>
+<body class="bg-black text-white font-sans" onload="fetchWeatherData()">
+    <!-- Header -->
+    <nav class="w-full bg-[#23c48e] py-4 px-6 fixed top-0 left-0 flex items-center text-black shadow-md">
+        <a href="{% url 'home' %}" class="text-2xl font-bold">&#x2190;</a>
+        <span class="ml-4 text-lg font-semibold">Weather</span>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="mt-20 px-4">
+        <!-- Temperature and Humidity -->
+        <div class="grid grid-cols-2 gap-2 text-center bg-gray-800 p-4 rounded-lg">
+            <div>
+                <p class="text-gray-400">อุณหภูมิ</p>
+                <p id="temperature" class="text-3xl text-blue-400">-- °C</p>
+            </div>
+            <div>
+                <p class="text-gray-400">ความชื้นสัมพัทธ์</p>
+                <p id="humidity" class="text-3xl text-green-400">-- %Rh</p>
+            </div>
+        </div>
+
+        <div class="bg-gray-900 p-4 mt-4 rounded-lg">
+            <p class="text-blue-400">กราฟแสดงค่าอุณหภูมิย้อนหลัง</p>
+            <div class="h-32 bg-gray-700 rounded mt-2"></div>
+            <div class="flex justify-around mt-2 text-gray-400 text-sm">
+                <span>15m</span><span>1h</span><span>12h</span><span>1d</span><span>1w</span><span>1M</span><span>3M</span>
+            </div>
+        </div>
+
+        <!-- AI Mode and VPD -->
+        <div class="grid grid-cols-2 gap-2 mt-4 text-center">
+            <button onclick="getWateringAdvice()" class="bg-green-500 text-black p-4 rounded-lg w-full font-bold">
+                ใช้งาน AI
+            </button>
+            <div class="bg-gray-800 p-4 rounded-lg">
+                <p>ค่า VPD</p>
+                <p id="vpd" class="text-2xl text-blue-400">-- kPa</p>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="bg-gray-800 p-4 mt-4 rounded-lg text-[#23c48e]" id="advice">
+            คำแนะนำ
+        </div>
+    </div>
+
+
+    <div class="mt-4 bg-gray-800 p-6 rounded-lg flex justify-center">
+        <button class="w-full text-center bg-gray-900 border border-[#23c48e] text-green-400 py-4 rounded-full text-xl">V2</button>
+    </div>
+
+
     <script>
-        function getLocationAndFetchWeather() {
+        const apiKey = "AIzaSyCeOZNd0HZbVddEulAQ1o3RVvXn2w9Jjl4";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+        function fetchWeatherData() {
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition((position) => {
                     const latitude = position.coords.latitude;
                     const longitude = position.coords.longitude;
-
-                    // ส่งตำแหน่งไปที่ Backend
                     fetch(`/get_weather?lat=${latitude}&lon=${longitude}`)
                         .then(response => response.json())
                         .then(data => {
                             if (data.error) {
-                                document.getElementById("weather").innerText = `Error: ${data.error}`;
+                                document.getElementById("advice").innerText = `Error: ${data.error}`;
                             } else {
-                                document.getElementById("weather").innerHTML = `
-                                    <p class="text-lg font-medium">Temperature: ${data.temperature}°C</p>
-                                    <p class="text-lg font-medium">Humidity: ${data.humidity}%</p>
-                                    <p class="text-lg font-medium">Rainfall: ${data.rainfall} mm</p>
-                                    <p class="text-lg font-medium">Wind Speed: ${data.wind_speed} km/h</p>
-                                `;
+                                let temperature = data.temperature;
+                                let humidity = data.humidity;
+
+                                document.getElementById("temperature").innerText = `${temperature} °C`;
+                                document.getElementById("humidity").innerText = `${humidity} %Rh`;
+
+                                let svp = 0.6108 * Math.exp((17.27 * temperature) / (temperature + 237.3));
+                                let vpdValue = ((1 - (humidity / 100)) * svp).toFixed(3);
+                                document.getElementById("vpd").innerText = `${vpdValue} kPa`;
                             }
                         })
                         .catch(error => {
-                            document.getElementById("weather").innerText = "Error fetching weather data.";
+                            document.getElementById("advice").innerText = "Error fetching weather data.";
                         });
                 }, (error) => {
-                    document.getElementById("weather").innerText = "Unable to get your location.";
+                    document.getElementById("advice").innerText = "Unable to get your location.";
                 });
             } else {
                 alert("Geolocation is not supported by this browser.");
             }
         }
+
+        function getWateringAdvice() {
+            let adviceElement = document.getElementById("advice");
+            adviceElement.innerHTML = "<span class='text-yellow-400'>กำลังประมวลผล...</span>";
+            let temperature = document.getElementById("temperature").innerText.replace(" °C", "");
+            let humidity = document.getElementById("humidity").innerText.replace(" %Rh", "");
+            
+            if (temperature === "--" || humidity === "--") {
+                document.getElementById("advice").innerText = "กรุณาดึงข้อมูลสภาพอากาศก่อน";
+                return;
+            }
+
+            const requestData = {
+                "contents": [{
+                    "parts": [{
+                        "text": `อุณหภูมิ ${temperature} องศา ความชื้นในอากาศ ${humidity} ดินทราย สำหรับให้น้ำทุเรียนอายุ 45 วันต่อต้น ทรงพุ่มขนาด 6 เมตร ควรรดน้ำไหมครับ ถ้ารดจะต้องใช้น้ำกี่ลิตรต่อต้น โดยให้คำตอบ ตอบกลับมาแค่ว่า แนะนำ กับ ไม่แนะนำ และให้เหตุผลประกอบคำแนะนำ`
+                    }]
+                }]
+            };
+
+            document.getElementById("advice").innerText = "กำลังประมวลผล...";
+            
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(requestData)
+            })
+            .then(response => response.json())
+            .then(responseData => {
+                if (responseData && responseData.candidates && responseData.candidates.length > 0) {
+                    let advice = responseData.candidates[0].content.parts[0].text;
+                    document.getElementById("advice").innerText = advice;
+                } else {
+                    document.getElementById("advice").innerText = "ไม่สามารถดึงคำแนะนำได้";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching API:", error);
+                document.getElementById("advice").innerText = "เกิดข้อผิดพลาดในการดึงข้อมูล";
+            });
+        }
     </script>
-</head>
-<body class="bg-green-800 bg-opacity-50 min-h-screen flex items-center justify-center">
-    <div class="bg-white bg-opacity-90 shadow-lg rounded-lg p-6 max-w-md w-full text-center">
-        <h1 class="text-3xl font-bold text-green-700 mb-6">Smart Farm - Weather</h1>
-        <button onclick="getLocationAndFetchWeather()" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300">
-            Get Weather
-        </button>
-        <div id="weather" class="mt-4 text-gray-700 text-left"></div>
-        <a href="{% url 'logout' %}" class="block mt-6 text-red-500 hover:underline">Logout</a>
-    </div>
 </body>
 </html>

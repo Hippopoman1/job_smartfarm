@@ -26,10 +26,10 @@ SECRET_KEY = 'django-insecure-pw@%t4h#z*w_kkc0y=3oyue53795es@j()r6+*+=od3ii1_!6h
 DEBUG = True
 
 # เพิ่ม URL ของ Ngrok ใน ALLOWED_HOSTS
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.0.112', '74b4-223-205-228-208.ngrok-free.app']
+ALLOWED_HOSTS = ['*']
 
 # เพิ่ม URL ของ Ngrok ใน CSRF_TRUSTED_ORIGINS
-CSRF_TRUSTED_ORIGINS = ['https://74b4-223-205-228-208.ngrok-free.app']
+CSRF_TRUSTED_ORIGINS = ['https://1b64-2403-6200-8822-2a94-78c1-a0e4-a262-ae25.ngrok-free.app']
 
 # Application definition
 
@@ -89,7 +89,7 @@ WSGI_APPLICATION = 'web.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'smartfarm',      # ชื่อฐานข้อมูล
+        'NAME': 'vsmart_farm',      # ชื่อฐานข้อมูล
         'USER': 'root',      # ชื่อผู้ใช้งาน MySQL
         'PASSWORD': 'Narathip998900@', # รหัสผ่าน
         'HOST': 'localhost',               # หรือ IP Address ของเซิร์ฟเวอร์ฐานข้อมูล
@@ -145,3 +145,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 LOGIN_URL = '/login/'
 LOGOUT_REDIRECT_URL = '/login/'
+
+STATICFILES_DIRS = [BASE_DIR / "static"]
