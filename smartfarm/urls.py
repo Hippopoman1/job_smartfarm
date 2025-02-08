@@ -10,5 +10,7 @@ urlpatterns = [
     path('dashboard/',dashboard,name='dashboard'),
     path('get_weather/', get_weather, name='get_weather'), 
     path('weather/', lambda request: render(request, 'get_weather.html'), name='weather'),  #
+    path("generate_content", generate_content, name="generate_content"),
+
 ]
   

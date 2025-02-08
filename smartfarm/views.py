@@ -3,6 +3,8 @@ from django.contrib import messages
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from .forms import RegisterForm, LoginForm
 from .models import User
+from django.conf import settings
+
 
 # Create your views here.
 def home (request):
@@ -68,7 +70,6 @@ def get_weather(request):
     # เรียก API ของ OpenWeatherMap
     url = f'https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&units=metric&appid={api_key}'
     response = requests.get(url)
-
     if response.status_code == 200:
         weather_data = response.json()
 
@@ -76,13 +77,40 @@ def get_weather(request):
         temperature = weather_data['main']['temp']
         humidity = weather_data['main']['humidity']
         wind_speed = weather_data['wind']['speed']
-        rainfall = weather_data.get('rain', {}).get('1h', 0)  
+        rainfall = weather_data.get('rain', {}).get('1h', 0)         
         return JsonResponse({
             'temperature': temperature,
             'humidity': humidity,
             'wind_speed': wind_speed,
-            'rainfall': rainfall
+            'rainfall': rainfall,
         })
     else:
         return JsonResponse({'error': 'Unable to fetch weather data.'}, status=response.status_code)
 
+import requests
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt  # ใช้เพื่อปิดการตรวจสอบ CSRF
+from django.conf import settings
+
+@csrf_exempt  # ปิดการตรวจสอบ CSRF สำหรับ endpoint นี้
+def generate_content(request):
+    api_key = settings.API_KEY
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+
+    if request.method == "POST":
+        try:
+            payload = request.body  # อ่าน payload ที่ส่งมาจาก frontend
+            headers = {"Content-Type": "application/json"}
+            response = requests.post(url, data=payload, headers=headers)
+
+            if response.status_code == 200:
+                return JsonResponse(response.json(), safe=False)
+            else:
+                return JsonResponse(
+                    {"error": f"Failed to fetch data: {response.status_code}, {response.text}"},
+                    status=response.status_code,
+                )
+        except Exception as e:
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request method."}, status=400)

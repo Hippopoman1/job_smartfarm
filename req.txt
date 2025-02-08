@@ -2,3 +2,4 @@ mysqlclient
 requests
 djangorestframework
 django
+python-decouple
