@@ -149,4 +149,3 @@ LOGOUT_REDIRECT_URL = '/login/'
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
 API_KEY = config("API_KEY")
-print(API_KEY) 
